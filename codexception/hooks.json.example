@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/david/.codex/skills/codexception/scripts/codexception-activator.sh",
+            "command": "~/.codex/skills/codexception/scripts/codexception-activator.sh",
             "timeout": 10,
             "statusMessage": "Checking for reusable learning"
           }

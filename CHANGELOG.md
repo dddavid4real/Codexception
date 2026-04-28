@@ -1,3 +1,11 @@
+## [0.1.1] - 2026-04-28
+
+### Documentation
+- Moved optional hook setup next to installation in `README.md`.
+- Expanded hook setup into concrete config, chmod, hook JSON, and restart steps.
+- Clarified that existing `hooks.json` files should be merged instead of replaced.
+- Replaced the hardcoded local hook path in `hooks.json.example` with a home-relative path.
+
 ## [0.1.0] - 2026-04-28
 
 ### Features

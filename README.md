@@ -93,6 +93,8 @@ The best descriptions include exact signals future Codex sessions can match:
 
 ## Installation
 
+### Step 1: Install the skill
+
 Copy the `codexception` folder into your personal Codex skills directory:
 
 ```bash
@@ -102,6 +104,56 @@ cp -R codexception ~/.codex/skills/
 ```
 
 After copying, start a new Codex session or reload your current one so the skill list refreshes.
+
+### Step 2: Optional hook reminder
+
+The skill can activate through normal skill matching. The hook is optional.
+
+Use the hook when you want Codex to remind itself after every prompt to check whether the completed work produced reusable knowledge.
+
+1. Enable Codex hooks in `~/.codex/config.toml`:
+
+```toml
+[features]
+codex_hooks = true
+```
+
+2. Make the activator executable:
+
+```bash
+chmod +x ~/.codex/skills/codexception/scripts/codexception-activator.sh
+```
+
+3. Add this `UserPromptSubmit` hook to `~/.codex/hooks.json`:
+
+If `~/.codex/hooks.json` already exists, merge the `UserPromptSubmit` block into it instead of replacing the whole file.
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.codex/skills/codexception/scripts/codexception-activator.sh",
+            "timeout": 10,
+            "statusMessage": "Checking for reusable learning"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The same hook JSON is included in `codexception/hooks.json.example`.
+
+If your hook runner does not expand `~`, replace it with the absolute path to your home directory.
+
+The hook only reminds Codex to evaluate whether extraction is useful. It does not create or promote active skills by itself.
+
+After changing hooks or config, restart Codex.
 
 ## Usage
 
@@ -145,21 +197,6 @@ Promotion is separate and approval-based:
 ```
 
 The staging step is the safety layer. It gives you a reviewable artifact before anything joins the active skill inventory.
-
----
-
-## Optional Hook Setup
-
-Codexception includes an example hook and config snippet for automatic evaluation reminders:
-- `codexception/hooks.json.example`
-- `codexception/config.toml.example`
-- `codexception/scripts/codexception-activator.sh`
-
-The hook should only remind Codex to evaluate whether extraction is useful.
-
-It should not create or promote active skills by itself.
-
----
 
 ## Acknowledgement
 

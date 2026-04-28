@@ -9,7 +9,7 @@ description: |
   before promotion into ~/.codex/skills/learned.
 metadata:
   source: migrated-from-claudeception
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Codexception
@@ -64,7 +64,8 @@ rg -i "keyword|exact error|tool name|project marker" "$HOME/.codex/skills" "$HOM
 5. For technology-specific knowledge that may have changed, verify with current primary sources.
 6. Draft the skill candidate using `resources/skill-template.md`.
 7. Save candidates to `~/.codex/skill-candidates/<YYYY-MM-DD>_<slug>/SKILL.md`.
-8. Tell the user what was staged and why. Do not silently promote a candidate into the active skills directory unless the user explicitly approves.
+8. Report every staged candidate to the user with the candidate path, short reason, and verification status.
+9. Ask the user to review and approve promotion. Do not promote a candidate into the active skill inventory in the same turn it was staged unless the user has already explicitly approved that exact candidate.
 
 ## Retrospective Mode
 
@@ -76,6 +77,7 @@ When the user invokes Codexception explicitly, asks "what did we learn?", or say
 3. Prioritize the highest-value, most reusable candidates.
 4. Stage candidate skills for the top 1-3 candidates.
 5. Summarize what was staged, what was skipped, and why.
+6. Ask the user to review staged candidates before any promotion into the active skill inventory.
 
 ## Self-Reflection Prompts
 
@@ -92,10 +94,41 @@ Use these checks after substantial work:
 Use these locations:
 
 - staged candidate: `~/.codex/skill-candidates/<date>_<slug>/SKILL.md`
-- active user skill after approval: `~/.codex/skills/learned/<slug>/SKILL.md`
+- active user skill after explicit user approval: `~/.codex/skills/learned/<slug>/SKILL.md`
 - project skill after approval: `<repo>/.agents/skills/<slug>/SKILL.md`
 
 Prefer staged candidates by default. Promotion changes the active skill library and should be deliberate.
+
+## Review And Promotion Flow
+
+Staging and promotion are separate actions.
+
+After staging any candidate:
+
+1. Report the candidate path.
+2. Explain why it may be worth keeping.
+3. State whether it is new, a variant, or a possible replacement.
+4. Ask the user to review and approve promotion.
+5. Stop there unless the user has already approved that exact promotion.
+
+When the user approves a staged candidate, promote it to the active learned inventory:
+
+```sh
+mkdir -p "$HOME/.codex/skills/learned/<slug>"
+cp "$HOME/.codex/skill-candidates/<date>_<slug>/SKILL.md" "$HOME/.codex/skills/learned/<slug>/SKILL.md"
+```
+
+Before promotion:
+
+- if the destination does not exist, create it
+- if the destination already exists, compare the files and ask before overwriting
+- if the candidate is meant to update an existing active skill, preserve the old skill unless the user approves replacement
+
+After promotion:
+
+- report the active skill path
+- tell the user to restart Codex so the skill list reloads
+- leave the staged candidate in place unless the user asks to archive or remove it
 
 ## Create Or Update Decision
 

@@ -28,7 +28,8 @@ Codexception guides Codex to:
 - separate skill-worthy knowledge from project docs, session logs, or notes
 - draft a complete `SKILL.md` using a reusable template
 - stage candidates under `~/.codex/skill-candidates/`
-- avoid promoting anything into active skills without explicit approval
+- report every staged candidate for user review
+- promote approved candidates into `~/.codex/skills/learned/`
 
 ---
 
@@ -63,7 +64,8 @@ Codexception is deliberately conservative:
 - **Be selective**: most tasks should not become skills
 - **Search before staging**: check existing skills so duplicates do not accumulate
 - **Stage by default**: create candidates under `~/.codex/skill-candidates/`
-- **Promote only with approval**: do not silently write into active skill directories
+- **Report every extraction**: tell the user what was staged, where it lives, and why it may be useful
+- **Promote only after review**: merge candidates into `~/.codex/skills/learned/` only after explicit user approval
 - **Verify honestly**: mark what worked, what was tested, and what remains unverified
 - **Protect sensitive data**: remove secrets, credentials, private URLs, and unnecessary internal details
 
@@ -198,6 +200,27 @@ Promotion is separate and approval-based:
 
 The staging step is the safety layer. It gives you a reviewable artifact before anything joins the active skill inventory.
 
+## Review And Promotion
+
+Every extracted skill candidate should be reported to the user before promotion.
+
+A good report includes:
+- the staged candidate path
+- why the candidate may be useful
+- whether it is new, a variant, or a possible replacement
+- verification status
+
+After review, promote an approved candidate into the active learned inventory:
+
+```bash
+mkdir -p ~/.codex/skills/learned/<slug>
+cp ~/.codex/skill-candidates/<date>_<slug>/SKILL.md ~/.codex/skills/learned/<slug>/SKILL.md
+```
+
+If the destination already exists, compare first and ask before overwriting.
+
+After promotion, restart Codex so the skill list reloads.
+
 ## Acknowledgement
 
 Codexception is the Codex-native adaptation of Claudeception: https://github.com/blader/Claudeception
@@ -212,10 +235,11 @@ A good Codexception run usually ends with:
 - zero staged candidates when nothing was reusable
 - one to three staged candidates when the session produced reusable knowledge
 - a clear reason for each staged candidate
+- user review before active promotion
 - no duplicate of an existing skill
 - no secrets or private data
 - honest verification notes
-- no active skill promotion without explicit approval
+- active promotion only after explicit approval
 
 ## License
 

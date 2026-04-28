@@ -1,3 +1,10 @@
+## [0.2.0] - 2026-04-28
+
+### Behavior
+- Require every staged skill candidate to be reported to the user for review.
+- Clarify that candidates move into `~/.codex/skills/learned/` only after explicit approval.
+- Add promotion steps and overwrite safeguards for approved candidates.
+
 ## [0.1.1] - 2026-04-28
 
 ### Documentation

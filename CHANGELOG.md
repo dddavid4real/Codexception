@@ -1,3 +1,11 @@
+## [0.3.0] - 2026-04-29
+
+### Behavior
+- Add a two-signal extraction rule so first occurrences are usually reported but not staged.
+- Allow first-occurrence staging only for high-confidence, verified, costly-to-rediscover lessons.
+- Add optional first-signal notes under `~/.codex/skill-candidates/_signals/`.
+- Update the hook reminder to point Codex toward tracking first signals and staging second signals.
+
 ## [0.2.0] - 2026-04-28
 
 ### Behavior

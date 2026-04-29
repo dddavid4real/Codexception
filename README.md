@@ -25,6 +25,7 @@ Codexception guides Codex to:
 - review completed work for reusable discoveries
 - skip ordinary one-off tasks
 - search existing skills before creating a new candidate
+- apply a two-signal rule before staging most candidates
 - separate skill-worthy knowledge from project docs, session logs, or notes
 - draft a complete `SKILL.md` using a reusable template
 - stage candidates under `~/.codex/skill-candidates/`
@@ -62,6 +63,7 @@ Do **not** use it for:
 Codexception is deliberately conservative:
 - **Finish first**: complete the user's requested work before extracting lessons
 - **Be selective**: most tasks should not become skills
+- **Two-signal threshold**: report the first signal as a possible pattern, then stage only after a second signal by default
 - **Search before staging**: check existing skills so duplicates do not accumulate
 - **Stage by default**: create candidates under `~/.codex/skill-candidates/`
 - **Report every extraction**: tell the user what was staged, where it lives, and why it may be useful
@@ -91,6 +93,29 @@ The best descriptions include exact signals future Codex sessions can match:
 - dataset conventions
 - workflow names
 
+## Two-Signal Rule
+
+Codexception should not stage a skill candidate every time something merely looks reusable.
+
+Default behavior:
+- first signal: report a possible reusable pattern, but do not stage a `SKILL.md`
+- second signal: stage a candidate under `~/.codex/skill-candidates/`
+- after staging: report it for review and wait for explicit approval before promotion
+
+A second signal can come from:
+- the same pattern recurring in the current session
+- an existing staged candidate, signal note, active skill, project doc, or session note
+- the user confirming that the pattern has happened before
+- the same error, file convention, command sequence, or workflow appearing in a related task
+
+First-occurrence extraction is still allowed when the lesson is high-confidence, verified, and costly to rediscover.
+
+Examples:
+- a misleading error with a verified fix
+- a dangerous workflow mistake prevented
+- a project convention clearly likely to recur
+- an expensive debugging path with a stable root cause
+
 ---
 
 ## Installation
@@ -111,7 +136,7 @@ After copying, start a new Codex session or reload your current one so the skill
 
 The skill can activate through normal skill matching. The hook is optional.
 
-Use the hook when you want Codex to remind itself after every prompt to check whether the completed work produced reusable knowledge.
+Use the hook when you want Codex to remind itself after every prompt to check whether the completed work produced a first signal or a second signal.
 
 1. Enable Codex hooks in `~/.codex/config.toml`:
 
@@ -153,7 +178,7 @@ The same hook JSON is included in `codexception/hooks.json.example`.
 
 If your hook runner does not expand `~`, replace it with the absolute path to your home directory.
 
-The hook only reminds Codex to evaluate whether extraction is useful. It does not create or promote active skills by itself.
+The hook only reminds Codex to evaluate whether tracking or extraction is useful. It does not create or promote active skills by itself.
 
 After changing hooks or config, restart Codex.
 
@@ -184,8 +209,17 @@ Codexception stages candidates like this:
 ```text
 ~/.codex/
 `-- skill-candidates/
-    `-- 2026-04-28_example-skill/
+    `-- YYYY-MM-DD_example-skill/
         `-- SKILL.md
+```
+
+Optional first-signal notes can live here:
+
+```text
+~/.codex/
+`-- skill-candidates/
+    `-- _signals/
+        `-- example-skill.md
 ```
 
 Promotion is separate and approval-based:
@@ -207,6 +241,7 @@ Every extracted skill candidate should be reported to the user before promotion.
 A good report includes:
 - the staged candidate path
 - why the candidate may be useful
+- whether it passed the two-signal rule or the first-occurrence exception bar
 - whether it is new, a variant, or a possible replacement
 - verification status
 
@@ -233,6 +268,7 @@ Claudeception introduced the core idea of using agent sessions as a source of re
 
 A good Codexception run usually ends with:
 - zero staged candidates when nothing was reusable
+- first-signal reports when a pattern looks reusable but is not ready to stage
 - one to three staged candidates when the session produced reusable knowledge
 - a clear reason for each staged candidate
 - user review before active promotion

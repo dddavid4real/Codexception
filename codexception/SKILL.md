@@ -9,13 +9,14 @@ description: |
   before promotion into ~/.codex/skills/learned.
 metadata:
   source: migrated-from-claudeception
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Codexception
 
 Extract reusable knowledge from a completed Codex session and turn it into a
 Codex skill candidate. Be selective: most tasks should not become skills.
+By default, wait for a second signal before staging a candidate.
 
 This is the Codex-native equivalent of Claudeception. It preserves the same core
 function: evaluate work sessions for reusable discoveries, search existing skills,
@@ -49,23 +50,60 @@ Skip extraction for:
 - project details better stored in `AGENTS.md`, `doc/`, `task_plan.md`, or `notes/session-logs/`
 - anything containing sensitive data
 
+## Two-Signal Extraction Rule
+
+Default threshold: stage a skill candidate only after the same reusable pattern
+has at least two signals.
+
+A signal can be:
+
+- the same pattern appears twice in the current session
+- an existing staged candidate, signal note, active skill, project doc, or session note shows a prior occurrence
+- the user confirms the pattern has happened before
+- the same error, command sequence, file convention, or workflow recurs in a different but clearly related task
+
+First-signal behavior:
+
+- do not stage a `SKILL.md` candidate yet
+- report it as a possible reusable pattern
+- state what would count as the second signal
+- optionally record a lightweight signal note under `~/.codex/skill-candidates/_signals/<slug>.md` when the pattern is safe, specific, and likely to recur
+
+Second-signal behavior:
+
+- stage a candidate under `~/.codex/skill-candidates/<YYYY-MM-DD>_<slug>/SKILL.md`
+- report the staged candidate for user review
+- wait for explicit approval before promotion into `~/.codex/skills/learned/`
+
+First-occurrence exception:
+
+Stage on the first signal only when the lesson is high-confidence, verified, and
+costly enough that rediscovering it would be wasteful. Examples include:
+
+- a misleading error with a verified fix
+- a dangerous or destructive workflow mistake prevented
+- a project convention that is clearly likely to recur
+- an expensive debugging path with a stable root cause
+
 ## Workflow
 
 1. Finish the user's requested work first.
 2. Identify 0-3 candidate lessons from the session.
-3. Search existing skills before creating anything:
+3. Determine whether each lesson is a first signal, second signal, or first-occurrence exception.
+4. Search existing skills, staged candidates, and signal notes before creating anything:
 
 ```sh
-rg --files -g 'SKILL.md' "$HOME/.codex/skills" "$HOME/.agents/skills" .agents/skills 2>/dev/null
-rg -i "keyword|exact error|tool name|project marker" "$HOME/.codex/skills" "$HOME/.agents/skills" .agents/skills 2>/dev/null
+rg --files -g 'SKILL.md' "$HOME/.codex/skills" "$HOME/.agents/skills" "$HOME/.codex/skill-candidates" .agents/skills 2>/dev/null
+rg -i "keyword|exact error|tool name|project marker" "$HOME/.codex/skills" "$HOME/.agents/skills" "$HOME/.codex/skill-candidates" .agents/skills 2>/dev/null
 ```
 
-4. Decide whether to create a new candidate, update an existing skill, or skip.
-5. For technology-specific knowledge that may have changed, verify with current primary sources.
-6. Draft the skill candidate using `resources/skill-template.md`.
-7. Save candidates to `~/.codex/skill-candidates/<YYYY-MM-DD>_<slug>/SKILL.md`.
-8. Report every staged candidate to the user with the candidate path, short reason, and verification status.
-9. Ask the user to review and approve promotion. Do not promote a candidate into the active skill inventory in the same turn it was staged unless the user has already explicitly approved that exact candidate.
+5. Decide whether to skip, report a first signal, stage a second-signal candidate, stage a first-occurrence exception, or update an existing skill.
+6. For first signals that do not meet the exception bar, report the possible pattern and stop before staging.
+7. For technology-specific knowledge that may have changed, verify with current primary sources.
+8. Draft the skill candidate using `resources/skill-template.md` only when the two-signal threshold or exception bar is met.
+9. Save candidates to `~/.codex/skill-candidates/<YYYY-MM-DD>_<slug>/SKILL.md`.
+10. Report every staged candidate to the user with the candidate path, short reason, signal count, and verification status.
+11. Ask the user to review and approve promotion. Do not promote a candidate into the active skill inventory in the same turn it was staged unless the user has already explicitly approved that exact candidate.
 
 ## Retrospective Mode
 
@@ -75,9 +113,10 @@ When the user invokes Codexception explicitly, asks "what did we learn?", or say
 1. Review the current session for extractable knowledge.
 2. Identify candidate skills with brief justifications.
 3. Prioritize the highest-value, most reusable candidates.
-4. Stage candidate skills for the top 1-3 candidates.
-5. Summarize what was staged, what was skipped, and why.
-6. Ask the user to review staged candidates before any promotion into the active skill inventory.
+4. Apply the two-signal rule to decide which candidates are ready to stage.
+5. Stage candidate skills only for second-signal patterns or high-value first-occurrence exceptions.
+6. Summarize what was staged, what was reported as a first signal, what was skipped, and why.
+7. Ask the user to review staged candidates before any promotion into the active skill inventory.
 
 ## Self-Reflection Prompts
 
@@ -94,6 +133,7 @@ Use these checks after substantial work:
 Use these locations:
 
 - staged candidate: `~/.codex/skill-candidates/<date>_<slug>/SKILL.md`
+- optional first-signal note: `~/.codex/skill-candidates/_signals/<slug>.md`
 - active user skill after explicit user approval: `~/.codex/skills/learned/<slug>/SKILL.md`
 - project skill after approval: `<repo>/.agents/skills/<slug>/SKILL.md`
 
